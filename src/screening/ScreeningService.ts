@@ -3,8 +3,23 @@ import { UserContext } from '../utils/user-context';
 import DbConnect from '../dbconnect/dbconnect';
 import { log } from 'console';
 import { JwtPayload } from 'jsonwebtoken';
+import { InsertOneResult, UpdateResult } from 'mongodb';
 
-export const getScreenings = async (req: Request, res: Response) => {};
+export const getScreenings = async (req: Request, res: Response) => {
+  const user = UserContext.get();
+  const userId = (user as JwtPayload)._id;
+
+  const { collection: ScreeningCollection, client } = DbConnect(
+    'screening',
+    'Hack2023'
+  );
+
+  const result = await ScreeningCollection.findOne({ userId });
+
+  await client.close();
+
+  res.status(200).send({ success: !!result?._id, data: { ...result } });
+};
 
 export const postScreenings = async (req: Request, res: Response) => {
   if (!req.body) {
@@ -15,6 +30,7 @@ export const postScreenings = async (req: Request, res: Response) => {
   const { lastScreeningDate, screened } = req.body;
   // get user Id from token
   const user = UserContext.get();
+  const userId = (user as JwtPayload)?._id;
   // save to data base
   const { collection: ScreeningCollection, client } = DbConnect(
     'screening',
@@ -22,15 +38,25 @@ export const postScreenings = async (req: Request, res: Response) => {
   );
 
   const payload = {
-    userId: (user as JwtPayload)?._id,
+    userId,
     lastScreeningDate,
     createdAt: Date.now(),
     screened,
   };
 
-  console.log(user);
+  const screening = await ScreeningCollection.find({ userId }).toArray();
+  let result: InsertOneResult<Document> | UpdateResult<Document>;
 
-  const result = await ScreeningCollection.insertOne(payload);
+  if (!screening.length) {
+    result = await ScreeningCollection.insertOne({ ...payload });
+  } else {
+    result = await ScreeningCollection.updateOne(
+      { userId },
+      { $set: { ...payload } }
+    );
+  }
+
+  console.log(result);
 
   await client.close();
 
