@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 
 import UserRouter from './src/user/UserRouter';
 import { screeningRouter } from './src/screening/ScreeningRouter';
+import ActivityRouter from './src/Activities/ActivityRouter';
 
 dotenv.config();
 const app: Express = express();
@@ -12,13 +13,11 @@ const app: Express = express();
 app.use(cors());
 app.use(express.json());
 
-// const port = process.env.PORT
+
 
 app.use('/user', UserRouter);
 app.use('/screening', screeningRouter);
+app.use('/activity', ActivityRouter )
 
-// app.listen(8080, () => {
-//   console.log(`⚡️[server]: Server is running at http://localhost:${8080}`);
-// });
 
 export const api = functions.https.onRequest(app);
