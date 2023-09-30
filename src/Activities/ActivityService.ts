@@ -26,7 +26,7 @@ export const getActivities = async (req: Request, res: Response) => {
 
   const usersActivities = await ActivitiesCollection.findOne({ user_id: _id });
 
-  if (usersActivities && !sameDay(usersActivities?.date, DateFunction())) {
+  if (usersActivities && sameDay(usersActivities?.date, DateFunction())) {
     res.status(200).send({ success: true, activities: usersActivities });
     await ActivitesClient.close();
     return;
@@ -98,12 +98,11 @@ export const updateFields = async (req: Request, res: Response) => {
 
   if (!values) {
     res.status(200).send({ success: false });
-    await ActivitesClient.close()
-    return
+    await ActivitesClient.close();
+    return;
   }
 
-  res.status(200).send({ success: true, fields:fields });
+  res.status(200).send({ success: true, fields: fields });
   await ActivitesClient.close();
   return;
 };
-
