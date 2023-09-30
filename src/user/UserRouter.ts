@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { login, verifyNumber } from "./UserAuth";
-import { TokenWare } from "../Middlewares/Tokenware";
+import { TokenWare } from "../Middlewares/TokenWare";
 
 const UserRouter = Router();
 
