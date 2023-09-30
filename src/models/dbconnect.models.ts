@@ -1,2 +1,3 @@
-export type Collections = "user" | "activities"
-export type Database = "Hack2023"
+
+export type Collections = 'user' | 'screening' | "activities";
+export type Database = 'Hack2023';
